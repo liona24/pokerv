@@ -58,7 +58,7 @@ class ReportingPlayer(player.PlayerBase):
 
 class AiPlayer(ReportingPlayer):
 
-    def __init__(self, name, initstack, sid, room_name, socket):
+    def __init__(self, name, initstack, sid, room_name, socket, *dummy):
         ReportingPlayer.__init__(self, name, initstack, sid, room_name, socket)
 
 
