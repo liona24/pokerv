@@ -43,7 +43,7 @@ def play_pause(args):
     try:
         if play:
             rooms[room].start_game(lambda s: hand_finished(s, room))
-            return 'ok', 200, 'Game started!'
+            return response('ok', 200, 'Game started!')
         else:
             rooms[room].stop_game()
             return response('ok',
