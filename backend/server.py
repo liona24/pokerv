@@ -79,7 +79,7 @@ def create(args):
 
     if room not in rooms:
         rooms[room] = Room(room, size, initstack, blinds)
-        emit('message', "Created room '%s'!" % room)
+        emit('message', "Created room '%s'!" % room, room=request.sid)
         return response('ok', 200, None)
 
     return response('err', 404, 'The desired room is already in use!')
