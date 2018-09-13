@@ -1,4 +1,5 @@
 import threading
+import time
 
 from pokergame import Game, player
 from deuces import Card
@@ -60,6 +61,10 @@ class AiPlayer(ReportingPlayer):
 
     def __init__(self, name, initstack, sid, room_name, socket, *dummy):
         ReportingPlayer.__init__(self, name, initstack, sid, room_name, socket)
+
+    def move(self, players, board, to_call, pot):
+        time.sleep(3)
+        return ReportingPlayer.move(self, players, board, to_call, pot)
 
 
 class HumanPlayer(ReportingPlayer):
@@ -124,7 +129,7 @@ class Room(object):
                 % str(player_name)
 
         self.game.leave(p)
-        return 'ok', 200, ''
+        return 'ok', 200, '%s left the game!' % player_name
 
     @property
     def isempty(self):
