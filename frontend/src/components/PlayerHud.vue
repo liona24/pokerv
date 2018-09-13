@@ -3,7 +3,9 @@
         <div class="top-panel">
             <div class="float-right">
                 <input type="button" value="Leave" @click="leave">
-                <input type="button" value="Add AI" @click="addAi">
+
+                <add-ai-menu v-if="showAiMenu" @close="showAiMenu = false" :room="room" />
+                <input v-else type="button" value="Add AI" @click="addAi">
             </div>
             <div class="float-left">
                 <input type="button" :value="playing ? 'Pause' : 'Start'" @click="playPause">
@@ -27,20 +29,24 @@
 
 <script>
 import Card from './Card.vue'
+import AddAiMenu from './AddAiMenu.vue'
 
 export default {
     name: 'PlayerHud',
     components: {
-        Card
+        Card,
+        AddAiMenu
     },
     props: {
         board: Array,
         hand: Array,
-        playing: Boolean
+        playing: Boolean,
+        room: String
     },
     data: function() {
         return {
-            betsize: 0
+            betsize: 0,
+            showAiMenu: false
         };
     },
     methods: {
@@ -54,7 +60,7 @@ export default {
 
         },
         addAi: function(e) {
-
+            this.showAiMenu = true;
         },
         leave: function(e) {
 

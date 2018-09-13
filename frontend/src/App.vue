@@ -55,4 +55,12 @@ export default {
   color: #002323;
   margin-top: 60px;
 }
+
+.float-left {
+    float: left
+}
+
+.float-right {
+    float: right
+}
 </style>

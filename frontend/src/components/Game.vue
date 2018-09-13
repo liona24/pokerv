@@ -1,5 +1,5 @@
 <template>
-    <player-hud :board="board" :hand="hand" :playing="playing" @playpause="playPause">
+    <player-hud :room="room" :board="board" :hand="hand" :playing="playing" @playpause="playPause">
         <poker-table :players="players" :fronti="self" :pot="pot"/>
     </player-hud>
 </template>
@@ -9,6 +9,7 @@ import PlayerHud from './PlayerHud.vue'
 import PokerTable from './PokerTable.vue'
 
 import { joinRoom } from '../communication.js'
+import { flash } from '../EventBus.js'
 
 /*
                 {
@@ -45,6 +46,8 @@ export default {
                 if (msg) {
                     flash(status, msg);
                 }
+
+                // TODO leave room on error
             }
         );
     },
@@ -67,6 +70,7 @@ export default {
             console.log(data);
         },
         join: function(data) {
+            console.log(data);
             this.players = data.players;
         }
     }
