@@ -1,7 +1,6 @@
 <template>
     <div>
-        <canvas v-if="players.length > 1" ref="canvas" :width="width" :height="height"></canvas>
-        <span v-else>It seems like you do not have any friends :(</span>
+        <canvas ref="canvas" :width="width" :height="height"></canvas>
     </div>
 </template>
 
@@ -45,9 +44,6 @@ export default {
     },
     methods: {
         updateTable: function() {
-            if (this.players.length < 2) {
-                return;
-            }
             let canvas = this.$refs.canvas;
 
             if (canvas && canvas.getContext) {
@@ -71,6 +67,12 @@ export default {
 
                 ctx.textAlign = 'center';
                 ctx.font = "bold 15px 'Avenir', Helvetica, Arial, sans-serif";
+
+                if (this.players.length < 2) {
+
+                    ctx.fillText('It seems like you do not have any friends :(', rx, ry);
+                    return;
+                }
 
                 ctx.fillText(this.pot, rx, ry);
 
