@@ -1,6 +1,6 @@
 <template>
     <player-hud :room="room" :board="board" :hand="hand" :playing="playing" @playpause="playPause">
-        <poker-table :players="players" :fronti="self" :pot="pot"/>
+        <poker-table :players="players" :front="self" :pot="pot" :active="active" />
     </player-hud>
 </template>
 
@@ -36,11 +36,15 @@ export default {
             hand: [],
             pot: 0,
             self: 0,
+            active: -1,
             players: [],
             playing: false
         }
     },
     created: function() {
+        this.$socket.on('move', this.onMove);
+        this.$socket.on('join', this.onJoin);
+
         joinRoom(this.$socket, this.room, this.user, 'human').then(
             (status, code, msg) => {
                 if (msg) {
@@ -50,6 +54,10 @@ export default {
                 // TODO leave room on error
             }
         );
+    },
+    beforeDestroy: function() {
+        this.$socket.off('move', this.onMove);
+        this.$socket.off('join', this.onJoin);
     },
     methods: {
         playPause: function(e) {
@@ -63,14 +71,14 @@ export default {
                     }
                 }
             );
-        }
-    },
-    socket: {
-        move: function(data) {
-            console.log(data);
         },
-        join: function(data) {
-            console.log(data);
+        onMove: function(data) {
+            console.log('onMove', data);
+        },
+        onJoin: function(data) {
+            console.log('onJoin', data);
+            this.self = data.players.findIndex((player) => player.name == this.user);
+            this.hand = data.players[this.self].hand;
             this.players = data.players;
         }
     }

@@ -27,10 +27,11 @@ export default {
       user: "Lion"
     }
   },
-  socket: {
-    message: function(msg) {
-      flash('ok', msg);
-    }
+  created: function() {
+    this.$socket.on('message', this.onMessage);
+  },
+  beforeDestroy: function() {
+    this.$socket.off('message', this.onMessage);
   },
   methods: {
     joinGame: function(e) {
@@ -41,6 +42,9 @@ export default {
     leaveGame: function(e) {
       this.state = 'HOME';
       this.room = '';
+    },
+    onMessage: function(msg) {
+      flash('ok', msg);
     }
   }
 }
