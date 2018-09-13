@@ -63,8 +63,9 @@ class AiPlayer(ReportingPlayer):
         ReportingPlayer.__init__(self, name, initstack, sid, room_name, socket)
 
     def move(self, players, board, to_call, pot):
+        rv = ReportingPlayer.move(self, players, board, to_call, pot)
         time.sleep(3)
-        return ReportingPlayer.move(self, players, board, to_call, pot)
+        return rv
 
 
 class HumanPlayer(ReportingPlayer):
