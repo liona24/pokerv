@@ -12,7 +12,7 @@ playerInfoLayout = {
     name: String,
     stack: Number,
     bet: Number,
-    itsTurn: Boolean
+    folded: Boolean
 }
 */
 
@@ -20,7 +20,8 @@ export default {
     name: 'PokerTable',
     props: {
         players: Array,
-        fronti: Number,
+        front: Number,
+        active: Number,
         pot: Number,
         width: {
             type: Number,
@@ -47,9 +48,9 @@ export default {
             if (this.players.length < 2) {
                 return;
             }
-            let canvas = this.$refs.canvas
+            let canvas = this.$refs.canvas;
 
-            if (canvas.getContext) {
+            if (canvas && canvas.getContext) {
                 let ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -77,7 +78,7 @@ export default {
                     let x = sx * Math.sin(delta * i);
                     let y = sy * Math.cos(delta * i);
 
-                    let j = (i + this.fronti) % this.players.length;
+                    let j = (i + this.front) % this.players.length;
                     let player = this.players[j];
 
                     ctx.fillText(`${player.name} (${player.stack})`, rx + sname * x, ry + sname * y);
@@ -85,7 +86,7 @@ export default {
                         ctx.fillText(player.bet, rx + sbet * x, ry + sbet * y);
                     }
 
-                    if (player.itsTurn) {
+                    if (i === this.active) {
                         turnx = rx + sname * x;
                         turny = ry + sname * y;
                     }
@@ -98,6 +99,8 @@ export default {
                 }
                 ctx.moveTo(rx, ry);
                 ctx.beginPath();
+                ctx.strokeStyle = '#002323';
+                ctx.lineWidth = 1;
 
                 for (let i = 1; i <= n; i++) {
                     ctx.lineTo(rx + sx * Math.sin(delta * i), ry + sy * Math.cos(delta * i));
