@@ -54,11 +54,11 @@ export default {
     methods: {
         playPause: function(e) {
             this.$socket.emit('playpause', { play: e.play, room: this.room },
-                (status, code, msg) => {
-                    if (msg) {
-                        flash(status, msg);
+                (resp) => {
+                    if (resp.msg) {
+                        flash(resp.status, resp.msg);
                     }
-                    if (status == 'ok') {
+                    if (resp.status == 'ok') {
                         this.playing = !e.play;
                     }
                 }

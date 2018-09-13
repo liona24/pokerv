@@ -22,13 +22,13 @@ export default {
   },
   data: function() {
     return {
-      state: "GAME",
+      state: "HOME",
       room: "Lion's Room",
       user: "Lion"
     }
   },
   socket: {
-    messageChannel: function(msg) {
+    message: function(msg) {
       flash('ok', msg);
     }
   },

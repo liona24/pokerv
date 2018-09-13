@@ -63,12 +63,14 @@ export default {
 
             createRoom(this.$socket, this.room, 6, this.stacksize,
                        this.bblind, this.sblind).then(
-                (status, code, msg) => {
-                    if (msg) {
-                        flash(status, msg);
+                (resp) => {
+                    if (resp.msg) {
+                        flash(resp.status, resp.msg);
                     }
 
-                    this.join();
+                    if (resp.status === 'ok') {
+                        this.join();
+                    }
                 }
             );
         },
@@ -91,5 +93,4 @@ export default {
 </script>
 
 <style>
-
 </style>

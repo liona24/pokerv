@@ -24,12 +24,12 @@ export default {
     methods: {
         addAi: function(e) {
             joinRoom(this.$socket, this.room, this.name, 'ai').then(
-                (status, code, msg) => {
-                    if (msg) {
-                        flash(status, msg);
+                (resp) => {
+                    if (resp.msg) {
+                        flash(resp.status, resp.msg);
                     }
 
-                    if (status === 'ok') {
+                    if (resp.status === 'ok') {
                         this.$emit('close');
                     }
                 }

@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from flask import Flask, render_template, request
-from flask_socketio import SocketIO, emit, send, join_room,\
+from flask_socketio import SocketIO, emit, join_room,\
     leave_room, close_room
 
 from gameplay import Room, HumanPlayer, AiPlayer
@@ -20,6 +20,10 @@ rooms = {}
 # access through event_storage[room_name][name]
 # each 'event' consists of an threading.Event and associated data
 event_storage = defaultdict(dict)
+
+
+def response(status, code, msg):
+    return { 'status': status, 'code': code, 'msg': msg }
 
 
 def hand_finished(summary, room):
@@ -42,9 +46,11 @@ def play_pause(args):
             return 'ok', 200, 'Game started!'
         else:
             rooms[room].stop_game()
-            return 'ok', 200, 'Game will pause after this hand finished!'
+            return response('ok',
+                            200,
+                            'Game will pause after this hand finished!')
     except KeyError:
-        return 'err', 404, "The specified room does not exist!"
+        return response('err', 404, "The specified room does not exist!")
 
 
 @socketio.on('move')
@@ -55,12 +61,12 @@ def move(args):
 
     event = event_storage[room].pop(name, None)
     if event is None:
-        return 'err', 404, "It is not '%s's turn!" % name
+        return response('err', 404, "It is not '%s's turn!" % name)
 
     event.data.update(args)
     event.set()
 
-    return 'ok', 200
+    return response('ok', 200, None)
 
 
 @socketio.on('create')
@@ -73,9 +79,10 @@ def create(args):
 
     if room not in rooms:
         rooms[room] = Room(room, size, initstack, blinds)
-        return 'ok', 200
+        emit('message', "Created room '%s'!" % room)
+        return response('ok', 200, None)
 
-    return 'err', 404, 'The desired room is already in use!'
+    return response('err', 404, 'The desired room is already in use!')
 
 
 @socketio.on('join')
@@ -99,15 +106,15 @@ def join(args):
         status, errno, msg = room.join(player)
 
         if status == 'ok':
-            join_room(room)
-            send('Player %s entered the table!' % user_name, room=room_name)
-            emit('join',
-                 { 'players': room.serialize_players() },
+            join_room(room_name)
+            emit('message', 'Player %s entered the table!' % user_name,
                  room=room_name)
-        return status, errno, msg
+            emit('join', { 'players': room.serialize_players() },
+                 room=room_name)
+        return response(status, errno, msg)
 
     except KeyError:
-        return 'err', 404, 'This room does not exist!'
+        return response('err', 404, 'This room does not exist!')
 
 
 @socketio.on('leave')
@@ -119,13 +126,13 @@ def leave(args):
         status, errno, msg = rooms[room].leave(user)
         if status == 'ok':
             leave_room(room)
-            send("Player '%s' left the table!" % user, room=room)
+            emit('message', "Player '%s' left the table!" % user, room=room)
             if rooms[room].isempty():
                 del(rooms[room])
                 close_room(room)
-        return status, errno, msg
+        return response(status, errno, msg)
 
-    return 'err', 404, 'This room does not exist!'
+    return response('err', 404, 'This room does not exist!')
 
 
 if __name__ == '__main__':
