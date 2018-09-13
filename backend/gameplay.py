@@ -19,48 +19,45 @@ def serialize_cards(cards):
     return list(map(serialize_card, cards))
 
 
-def serialize_player(player):
-    return {
-        'sid': player.sid,
-        'room_name': player.room_name,
-        'name': player.name,
-        'stack': player.stack,
-        'bet': player.bet,
-        'hand': serialize_cards(player.hand)
-    }
-
-
-def serialize_players(players):
-    return list(map(serialize_player, players))
+def serialize_players(players, active_players, player_at_action):
+    return [ {
+        'name': p.name,
+        'stack': p.stack,
+        'bet': p.bet,
+        'hand': serialize_cards(p.hand),
+        'action_required': p == player_at_action,
+        'folded': p not in active_players
+    } for p in players ]
 
 
 class ReportingPlayer(player.PlayerBase):
 
-    def __init__(self, name, initstack, sid, room_name, socket):
+    def __init__(self, name, initstack, sid, room, socket):
         player.PlayerBase.__init__(self, name, initstack)
 
         self.sid = sid
-        self.room_name = room_name
+        self.room = room
         self.socket = socket
 
     def move(self, players, board, to_call, pot):
+
+        all_players = self.room.game.players
         payload = {
             'board': serialize_cards(board),
             'to_call': to_call,
             'pot': pot,
-            'players': serialize_players(players),
-            'active_player': players.index(self)
+            'players': serialize_players(all_players, players, self),
         }
 
-        self.socket.emit('move', payload, room=self.room_name)
+        self.socket.emit('move', payload, room=self.room.name)
 
         return player.PlayerBase.move(self, players, board, to_call, pot)
 
 
 class AiPlayer(ReportingPlayer):
 
-    def __init__(self, name, initstack, sid, room_name, socket, *dummy):
-        ReportingPlayer.__init__(self, name, initstack, sid, room_name, socket)
+    def __init__(self, name, initstack, sid, room, socket, *dummy):
+        ReportingPlayer.__init__(self, name, initstack, sid, room, socket)
 
     def move(self, players, board, to_call, pot):
         rv = ReportingPlayer.move(self, players, board, to_call, pot)
@@ -70,8 +67,8 @@ class AiPlayer(ReportingPlayer):
 
 class HumanPlayer(ReportingPlayer):
 
-    def __init__(self, name, initstack, sid, room_name, socket, event_storage):
-        ReportingPlayer.__init__(self, name, initstack, sid, room_name, socket)
+    def __init__(self, name, initstack, sid, room, socket, event_storage):
+        ReportingPlayer.__init__(self, name, initstack, sid, room, socket)
 
         self.event_storage = event_storage
 
@@ -79,7 +76,7 @@ class HumanPlayer(ReportingPlayer):
 
         event = threading.Event()
         event.data = {}
-        self.event_storage[self.room_name][self.name] = event
+        self.event_storage[self.room.name][self.name] = event
 
         ReportingPlayer.move(self, players, board, to_call, pot)
 
@@ -105,7 +102,7 @@ class Room(object):
             self.stop_playing()
 
     def serialize_players(self):
-        return serialize_players(self.game.players)
+        return serialize_players(self.game.players, self.game.players, None)
 
     def join(self, player):
 

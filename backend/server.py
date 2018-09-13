@@ -99,7 +99,7 @@ def join(args):
         player = typ(user_name,
                      room.initstack,
                      request.sid,
-                     room_name,
+                     room,
                      socketio,
                      event_storage)
 

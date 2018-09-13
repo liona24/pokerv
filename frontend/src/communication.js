@@ -26,6 +26,18 @@ export function joinRoom(socket, roomName, userName, playerType) {
     );
 }
 
+export function leaveRoom(socket, roomName, userName) {
+
+    console.log(`joinRoom( ${socket}, ${roomName}, ${userName} )`);
+
+    return new Promise((resolve) =>
+        socket.emit('leave', {
+            room: roomName,
+            user: userName
+        }, resolve)
+    );
+}
+
 export function move(socket, roomName, playerName, betsize) {
 
     console.log(`move( ${socket}, ${roomName}, ${playerName}, ${betsize})`);

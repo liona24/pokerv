@@ -1,6 +1,6 @@
 <template>
     <player-hud :room="room" :board="board" :hand="hand" :playing="playing" @playpause="playPause">
-        <poker-table :players="players" :front="self" :pot="pot" :active="active" />
+        <poker-table :players="players" :front="self" :pot="pot" />
     </player-hud>
 </template>
 
@@ -33,12 +33,15 @@ export default {
     data: function() {
         return {
             board: [],
-            hand: [],
             pot: 0,
             self: 0,
-            active: -1,
             players: [],
             playing: false
+        }
+    },
+    computed: {
+        hand: function() {
+            return (this.players[this.self] || { hand: [] }).hand;
         }
     },
     created: function() {
@@ -73,13 +76,20 @@ export default {
             );
         },
         onMove: function(data) {
-            console.log('onMove', data);
+            console.log('onMove');
+            console.log(JSON.stringify(data));
+
+            this.pot = data.pot;
+            this.board = data.board;
+
+            this.players = data.players;
+
         },
         onJoin: function(data) {
             console.log('onJoin', data);
-            this.self = data.players.findIndex((player) => player.name == this.user);
-            this.hand = data.players[this.self].hand;
+
             this.players = data.players;
+            this.self = this.players.findIndex(player => player.name === this.user);
         }
     }
 }

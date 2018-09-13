@@ -20,7 +20,6 @@ export default {
     props: {
         players: Array,
         front: Number,
-        active: Number,
         pot: Number,
         width: {
             type: Number,
@@ -47,10 +46,12 @@ export default {
             let canvas = this.$refs.canvas;
 
             if (canvas && canvas.getContext) {
+                let n = this.players.length;
+
                 let ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                let delta = Math.PI * 2 / this.players.length;
+                let delta = Math.PI * 2 / n;
 
                 let sx = 0.7 * canvas.width / 2;
                 let sy = 0.7 * canvas.height / 2;
@@ -68,34 +69,36 @@ export default {
                 ctx.textAlign = 'center';
                 ctx.font = "bold 15px 'Avenir', Helvetica, Arial, sans-serif";
 
-                if (this.players.length < 2) {
-
+                if (n < 2) {
                     ctx.fillText('It seems like you do not have any friends :(', rx, ry);
                     return;
                 }
 
                 ctx.fillText(this.pot, rx, ry);
 
-                for (let i = 1; i <= this.players.length; i++) {
+                for (let i = 1; i <= n; i++) {
                     let x = sx * Math.sin(delta * i);
                     let y = sy * Math.cos(delta * i);
 
-                    let j = (i + this.front) % this.players.length;
+                    let j = (i + this.front) % n;
                     let player = this.players[j];
 
-                    ctx.fillText(`${player.name} (${player.stack})`, rx + sname * x, ry + sname * y);
-                    if (player.bet) {
-                        ctx.fillText(player.bet, rx + sbet * x, ry + sbet * y);
-                    }
+                    if (!player.folded) {
+                        ctx.fillText(`${player.name} (${player.stack})`, rx + sname * x, ry + sname * y);
+                        if (player.bet) {
+                            ctx.fillText(player.bet, rx + sbet * x, ry + sbet * y);
+                        }
 
-                    if (i === this.active) {
-                        turnx = rx + sname * x;
-                        turny = ry + sname * y;
+                        if (player.action_required) {
+                            turnx = rx + sname * x;
+                            turny = ry + sname * y;
+                        }
+                    } else {
+                        ctx.fillText('Fold', rx + sname * x, ry + sname * y);
                     }
                 }
 
-                let n = this.players.length;
-                if (this.players.length === 2) {
+                if (n === 2) {
                     n = 4;
                     delta /= 2;
                 }
