@@ -6,12 +6,12 @@
 
     <label>
         <span>Username:</span>
-        <input type="text" v-model="user" name="username">
+        <input type="text" v-model="locals.user" name="username">
     </label>
     <br>
     <label>
         <span>Room:</span>
-        <input type="text" v-model="room" name="roomname">
+        <input type="text" v-model="locals.room" name="roomname">
     </label>
     <br>
     <br>
@@ -53,7 +53,15 @@ export default {
             bblind: 2,
             sblind: 1,
             socket: null,
+            locals: {
+                room: '',
+                user: ''
+            }
         }
+    },
+    created: function() {
+        this.locals.room = this.room;
+        this.locals.user = this.user;
     },
     methods: {
         create: function(e) {
@@ -80,8 +88,8 @@ export default {
             }
 
             this.$emit('joingame', {
-                user: this.user,
-                room: this.room
+                user: this.locals.user,
+                room: this.locals.room
             });
         },
         isInputValid: function() {
