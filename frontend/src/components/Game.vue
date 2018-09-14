@@ -44,7 +44,7 @@ export default {
     },
     created: function() {
         this.$socket.on('move', this.onMove);
-        this.$socket.on('join', this.onJoin);
+        this.$socket.on('playersChanged', this.onPlayersChanged);
 
         joinRoom(this.$socket, this.room, this.user, 'human').then(
             (resp) => {
@@ -60,7 +60,7 @@ export default {
     },
     beforeDestroy: function() {
         this.$socket.off('move', this.onMove);
-        this.$socket.off('join', this.onJoin);
+        this.$socket.off('playersChanged', this.onPlayersChanged);
     },
     methods: {
         playPause: function(e) {
@@ -70,7 +70,7 @@ export default {
                         flash(resp.status, resp.msg);
                     }
                     if (resp.status == 'ok') {
-                        this.playing = !e.play;
+                        this.playing = e.play;
                     }
                 }
             );
@@ -86,7 +86,7 @@ export default {
             this.players = data.players.reverse();
 
         },
-        onJoin: function(data) {
+        onPlayersChanged: function(data) {
             console.log('onJoin', data);
 
             // reverse because of some drawing logic 'flaw'

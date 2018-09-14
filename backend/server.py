@@ -42,13 +42,10 @@ def play_pause(args):
 
     try:
         if play:
-            rooms[room].start_game(lambda s: hand_finished(s, room))
-            return response('ok', 200, 'Game started!')
+            return response(
+                *rooms[room].start_game(lambda s: hand_finished(s, room)))
         else:
-            rooms[room].stop_game()
-            return response('ok',
-                            200,
-                            'Game will pause after this hand finished!')
+            return response(*rooms[room].stop_game())
     except KeyError:
         return response('err', 404, "The specified room does not exist!")
 
@@ -109,7 +106,7 @@ def join(args):
             join_room(room_name)
             emit('message', 'Player %s entered the table!' % user_name,
                  room=room_name)
-            emit('join', { 'players': room.serialize_players() },
+            emit('playersChanged', { 'players': room.serialize_players() },
                  room=room_name)
         return response(status, errno, msg)
 
@@ -126,10 +123,17 @@ def leave(args):
         status, errno, msg = rooms[room].leave(user)
         if status == 'ok':
             leave_room(room)
-            emit('message', "Player '%s' left the table!" % user, room=room)
-            if rooms[room].isempty():
-                del(rooms[room])
+            if rooms[room].isempty:
                 close_room(room)
+                rooms.pop(room)
+            else:
+                emit('message',
+                     "Player '%s' left the table!" % user,
+                     room=room)
+                emit('playersChanged',
+                     { 'players': rooms[room].serialize_players() },
+                     room=room)
+
         return response(status, errno, msg)
 
     return response('err', 404, 'This room does not exist!')

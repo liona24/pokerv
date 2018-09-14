@@ -17,22 +17,22 @@
     <br>
     <label>
         <span>Stack Size:</span>
-        <input type="number" v-model="stacksize" name="stacksize">
+        <input type="number" v-model="stacksize" name="stacksize" :disabled="disableDetailsInput">
     </label>
     <br>
     <label>
         <span>Big Blind:</span>
-        <input type="number" v-model="bblind" name="bblind">
+        <input type="number" v-model="bblind" name="bblind" :disabled="disableDetailsInput">
     </label>
     <br>
     <label>
         <span>Small Blind:</span>
-        <input type="number" v-model="sblind" name="sblind">
+        <input type="number" v-model="sblind" name="sblind" :disabled="disableDetailsInput">
     </label>
     <br>
     <br>
     <input type="button" value="Create" @click="create">
-    <input type="button" value="Join" @click="join">
+    <input type="button" value="Join" @click="join" @mouseover="disableDetailsInput = true" @mouseout="disableDetailsInput = false">
     </div>
 </template>
 
@@ -56,7 +56,8 @@ export default {
             locals: {
                 room: '',
                 user: ''
-            }
+            },
+            disableDetailsInput: false
         }
     },
     created: function() {
@@ -69,7 +70,7 @@ export default {
                 return;
             }
 
-            createRoom(this.$socket, this.room, 6, this.stacksize,
+            createRoom(this.$socket, this.locals.room, 6, this.stacksize,
                        this.bblind, this.sblind).then(
                 (resp) => {
                     if (resp.msg) {
@@ -93,8 +94,8 @@ export default {
             });
         },
         isInputValid: function() {
-            return this.room.length > 0 &&
-                   this.user.length > 0;
+            return this.locals.room.length > 0 &&
+                   this.locals.user.length > 0;
         }
     }
 }

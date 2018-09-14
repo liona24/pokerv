@@ -61,7 +61,7 @@ class AiPlayer(ReportingPlayer):
 
     def move(self, players, board, to_call, pot):
         rv = ReportingPlayer.move(self, players, board, to_call, pot)
-        time.sleep(3)
+        time.sleep(1)
         return rv
 
 
@@ -94,12 +94,23 @@ class Room(object):
         self.game = Game([], blinds)
         self.stop_playing = None
 
-    def start_game(self, summary_callback):
-        self.stop_playing = self.game.play_async(summary_callback)
+    def start_game(self, summary_hook):
+        if len(self.game.players) > 1:
+            if self.stop_playing is not None:
+                return 'ok', 200, 'The game is already running!'
+
+            self.stop_playing = self.game.play_async(None,
+                                                     summary_hook=summary_hook)
+            return 'ok', 200, 'The game started!'
+
+        return 'err', 404, 'Congratz! You played against yourself and won!'
 
     def stop_game(self):
         if self.stop_playing is not None:
             self.stop_playing()
+            return 'ok', 200, 'Game will pause after this hand finished!'
+
+        return 'err', 404, 'The game is not running!'
 
     def serialize_players(self):
         return serialize_players(self.game.players, self.game.players, None)

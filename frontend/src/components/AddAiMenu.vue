@@ -1,7 +1,5 @@
 <template>
-    <div>
-        <input type="text" v-model="name" ref="name" placeholder="Enter name" @keydown.enter="addAi">
-    </div>
+    <input type="text" v-model="name" :style="styleObj" ref="name" placeholder="Enter name" @keydown.enter="addAi" @blur="$emit('close')">
 </template>
 
 <script>
@@ -15,11 +13,20 @@ export default {
     },
     data: function() {
         return {
-            name: ''
+            name: '',
+            width: '0px'
         };
     },
     mounted: function() {
+        this.width = '300px';
         this.$refs.name.focus();
+    },
+    computed: {
+        styleObj: function() {
+            return {
+                'width': this.width
+            };
+        }
     },
     methods: {
         addAi: function(e) {
@@ -39,6 +46,16 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
+input {
+    position: fixed;
+    top: 0;
+    padding: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    right: 9px;
+    width: 0px;
+    transition: 0.25s
+}
 </style>

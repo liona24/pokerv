@@ -106,12 +106,13 @@ div.top-panel {
     left: 0px;
 }
 
-div.top-panel > input {
-    top: 6px;
+div.top-panel > div > input {
     position: relative;
-    float: right;
-    margin-left: 10px;
-    margin-right: 10px;
+    padding: 2px 13px 5px 13px;
+    margin-left: 12px;
+    margin-right: 12px;
+    font-size: 18px;
+    font-weight: bold;
 }
 
 .card-panel {
