@@ -11,7 +11,8 @@ playerInfoLayout = {
     name: String,
     stack: Number,
     bet: Number,
-    folded: Boolean
+    folded: Boolean,
+    action_required: Boolean
 }
 */
 
