@@ -1,5 +1,5 @@
 <template>
-    <player-hud :room="room" :board="board" :hand="hand" :playing="playing" @playpause="playPause">
+    <player-hud :player="player" :room="room" :board="board" :playing="playing" :pot="pot" :to-call="toCall" @playpause="playPause">
         <poker-table :players="players" :front="self" :pot="pot" />
     </player-hud>
 </template>
@@ -26,13 +26,20 @@ export default {
             board: [],
             pot: 0,
             self: 0,
+            toCall: 0,
             players: [],
             playing: false
         }
     },
     computed: {
-        hand: function() {
-            return (this.players[this.self] || { hand: [] }).hand;
+        player: function() {
+            return (this.players[this.self] || {
+                name: this.user,
+                stack: 0,
+                bet: 0,
+                folded: false,
+                action_required: false
+            });
         }
     },
     created: function() {
@@ -74,6 +81,7 @@ export default {
 
             this.pot = data.pot;
             this.board = data.board;
+            this.toCall = data.to_call;
 
             this.players = data.players.reverse();
 

@@ -41,7 +41,6 @@ export default {
     },
     leaveGame: function(e) {
       this.state = 'HOME';
-      this.room = '';
     },
     onMessage: function(msg) {
       flash('ok', msg);

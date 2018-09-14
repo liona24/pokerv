@@ -16,13 +16,13 @@
         </div>
         <slot></slot>
         <div class="card-panel hand">
-            <card v-for="(c, i) in hand" :key="'handcard-' + i" :ident="c"/>
+            <card v-for="(c, i) in player.hand" :key="'handcard-' + i" :ident="c"/>
         </div>
         <div class="bet-panel">
-            <input type="number" v-model="betsize" name="betsize">
-            <input type="button" value="Bet" @click="bet">
-            <input type="button" value="Call" @click="call">
-            <input type="button" value="Fold" @click="fold">
+            <input type="number" v-model="betsize" name="betsize" :disabled="!player.action_required">
+            <input type="button" value="Bet" @click="bet" :disabled="!player.action_required">
+            <input type="button" value="Call" @click="call" :disabled="!player.action_required">
+            <input type="button" value="Fold" @click="fold" :disabled="!player.action_required">
         </div>
     </div>
 </template>
@@ -30,6 +30,9 @@
 <script>
 import Card from './Card.vue'
 import AddAiMenu from './AddAiMenu.vue'
+
+import { flash } from '../EventBus.js'
+import { leaveRoom } from '../communication.js'
 
 export default {
     name: 'PlayerHud',
@@ -39,9 +42,11 @@ export default {
     },
     props: {
         board: Array,
-        hand: Array,
         playing: Boolean,
-        room: String
+        pot: Number,
+        room: String,
+        player: Object,
+        toCall: Number
     },
     data: function() {
         return {
@@ -51,22 +56,40 @@ export default {
     },
     methods: {
         bet: function(e) {
+            if (this.betsize > this.player.stack) {
+                this.betsize = this.player.stack;
+            }
 
+            if (this.betsize < this.toCall) {
+                flash('err', 'You have to bet at least ' + this.toCall);
+                return;
+            }
+
+            this.move(this.betsize);
         },
         call: function(e) {
-
+            this.betsize = this.toCall;
+            this.bet(null);
         },
         fold: function(e) {
-
+            this.move(-1);
         },
         addAi: function(e) {
             this.showAiMenu = true;
         },
         leave: function(e) {
-
+            leaveRoom(this.$socket, this.room, this.player.name);
+            this.$parent.$emit('leavegame');
         },
         playPause: function(e) {
             this.$emit('playpause', { play: !this.playing });
+        },
+        move: function(betsize) {
+            this.$socket.emit('move', {
+                name: this.player.name,
+                room: this.room,
+                betsize: betsize
+            });
         }
     }
 }
