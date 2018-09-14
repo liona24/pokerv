@@ -90,6 +90,7 @@ export default {
                 room: this.room,
                 betsize: betsize
             });
+            this.betsize = 0;
         }
     }
 }

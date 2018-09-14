@@ -108,6 +108,7 @@ class Room(object):
     def stop_game(self):
         if self.stop_playing is not None:
             self.stop_playing()
+            self.stop_playing = None
             return 'ok', 200, 'Game will pause after this hand finished!'
 
         return 'err', 404, 'The game is not running!'

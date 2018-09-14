@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import VueSocketIO from 'vue-socket.io';
 
-Vue.use(VueSocketIO, 'http://localhost:5000');
+Vue.use(VueSocketIO, process.env.NODE_ENV === 'production' ? process.env.BASE_URL : 'http://localhost:5000');
 
 Vue.config.productionTip = false
 

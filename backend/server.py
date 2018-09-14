@@ -30,6 +30,11 @@ def hand_finished(summary, room):
     socketio.emit('hand finished', summary, room=room)
 
 
+def update_players(room):
+    socketio.emit('players changed', { 'players': room.serialize_players() },
+                  room=room.name)
+
+
 @app.route('/', methods=[ 'GET' ])
 def index():
     return render_template('index.html')
@@ -106,8 +111,7 @@ def join(args):
             join_room(room_name)
             emit('message', 'Player %s entered the table!' % user_name,
                  room=room_name)
-            emit('playersChanged', { 'players': room.serialize_players() },
-                 room=room_name)
+            update_players(room)
         return response(status, errno, msg)
 
     except KeyError:
@@ -130,9 +134,7 @@ def leave(args):
                 emit('message',
                      "Player '%s' left the table!" % user,
                      room=room)
-                emit('playersChanged',
-                     { 'players': rooms[room].serialize_players() },
-                     room=room)
+                update_players(rooms[room])
 
         return response(status, errno, msg)
 

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --dest ../dist"
+    "build": "set NODE_ENV=production && vue-cli-service build"
   },
   "dependencies": {
     "@types/socket.io-client": "^1.4.32",

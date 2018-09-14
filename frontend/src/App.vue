@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <flash-messages />
+    <status-side-bar ref="sidebar" />
     <home v-if="state == 'HOME'" @joingame="joinGame" :user="user" :room="room"/>
     <game v-else-if="state == 'GAME'" @leavegame="leaveGame" :user="user" :room="room"/>
   </div>
@@ -10,15 +11,17 @@
 import Home from './components/Home.vue'
 import Game from './components/Game.vue'
 import FlashMessages from './components/FlashMessages.vue'
+import StatusSideBar from './components/StatusSideBar.vue'
 
-import { flash } from "./EventBus.js";
+import { EventBus, flash } from "./EventBus.js";
 
 export default {
   name: 'app',
   components: {
     Home,
     Game,
-    FlashMessages
+    FlashMessages,
+    StatusSideBar
   },
   data: function() {
     return {

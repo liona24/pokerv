@@ -9,7 +9,7 @@ import PlayerHud from './PlayerHud.vue'
 import PokerTable from './PokerTable.vue'
 
 import { joinRoom } from '../communication.js'
-import { flash } from '../EventBus.js'
+import { flash, status } from '../EventBus.js'
 
 export default {
     name: 'Game',
@@ -44,7 +44,8 @@ export default {
     },
     created: function() {
         this.$socket.on('move', this.onMove);
-        this.$socket.on('playersChanged', this.onPlayersChanged);
+        this.$socket.on('players changed', this.onPlayersChanged);
+        this.$socket.on('hand finished', this.onHandFinished);
 
         joinRoom(this.$socket, this.room, this.user, 'human').then(
             (resp) => {
@@ -60,7 +61,8 @@ export default {
     },
     beforeDestroy: function() {
         this.$socket.off('move', this.onMove);
-        this.$socket.off('playersChanged', this.onPlayersChanged);
+        this.$socket.off('players changed', this.onPlayersChanged);
+        this.$socket.off('hand finished', this.onHandFinished);
     },
     methods: {
         playPause: function(e) {
@@ -92,6 +94,13 @@ export default {
             // reverse because of some drawing logic 'flaw'
             this.players = data.players.reverse();
             this.self = this.players.findIndex(player => player.name === this.user);
+        },
+        onHandFinished: function(data) {
+            console.log('onHandFinished');
+            console.log(JSON.stringify(data));
+
+            let content = data.split('\n');
+            status(content.splice(0, 1)[0], content);
         }
     }
 }
