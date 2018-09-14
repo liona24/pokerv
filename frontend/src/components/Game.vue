@@ -11,15 +11,6 @@ import PokerTable from './PokerTable.vue'
 import { joinRoom } from '../communication.js'
 import { flash } from '../EventBus.js'
 
-/*
-                {
-                    name: 'Player3',
-                    stack: 10,
-                    bet: 10,
-                    itsTurn: true
-                },
-                */
-
 export default {
     name: 'Game',
     components: {
@@ -49,12 +40,14 @@ export default {
         this.$socket.on('join', this.onJoin);
 
         joinRoom(this.$socket, this.room, this.user, 'human').then(
-            (status, code, msg) => {
-                if (msg) {
-                    flash(status, msg);
+            (resp) => {
+                if (resp.msg) {
+                    flash(resp.status, resp.msg);
                 }
 
-                // TODO leave room on error
+                if (resp.status !== 'ok') {
+                    this.$emit('leavegame');
+                }
             }
         );
     },
@@ -82,13 +75,14 @@ export default {
             this.pot = data.pot;
             this.board = data.board;
 
-            this.players = data.players;
+            this.players = data.players.reverse();
 
         },
         onJoin: function(data) {
             console.log('onJoin', data);
 
-            this.players = data.players;
+            // reverse because of some drawing logic 'flaw'
+            this.players = data.players.reverse();
             this.self = this.players.findIndex(player => player.name === this.user);
         }
     }
