@@ -7,7 +7,7 @@ export function flash(status, msg) {
     EventBus.$emit('flash', { status: status, msg: msg });
 }
 
-export function status(heading, content) {
-    console.log(`status ( ${heading}, ${content})`);
-    EventBus.$emit('status', { heading: heading, content: content });
+export function handFinished(handNum, board, winners) {
+    console.log(`status ( ${winners})`);
+    EventBus.$emit('hand finished', { handNum, handNum, board: board, winners: winners });
 }

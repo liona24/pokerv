@@ -75,8 +75,6 @@ export default {
                     return;
                 }
 
-                ctx.fillText(this.pot, rx, ry);
-
                 for (let i = 1; i <= n; i++) {
                     let x = sx * Math.sin(delta * i);
                     let y = sy * Math.cos(delta * i);
@@ -84,15 +82,26 @@ export default {
                     let j = (i + this.front) % n;
                     let player = this.players[j];
 
-                    if (!player.folded) {
-                        ctx.fillText(`${player.name} (${player.stack})`, rx + sname * x, ry + sname * y);
-                        if (player.bet) {
-                            ctx.fillText(player.bet, rx + sbet * x, ry + sbet * y);
+                    if (player.bet) {
+                        if (player.is_allin) {
+                            ctx.font = "bold 15px #b92323 'Avenir', Helvetica, Arial, sans-serif";
                         }
+                        ctx.fillText(player.bet, rx + sbet * x, ry + sbet * y);
+                        if (player.is_allin) {
+                            ctx.font = "bold 15px 'Avenir', Helvetica, Arial, sans-serif";
+                        }
+                    }
+                    if (!player.has_folded) {
+                        ctx.fillText(`${player.name} (${player.stack})`, rx + sname * x, ry + sname * y);
 
                         if (player.action_required) {
                             turnx = rx + sname * x;
                             turny = ry + sname * y;
+                            ctx.beginPath();
+                            ctx.lineWidth = 5;
+                            ctx.strokeStyle = '#b92323';
+                            ctx.ellipse(turnx, turny, sturn * sx, sturn * sy, 0, 0, Math.PI * 2);
+                            ctx.stroke();
                         }
                     } else {
                         ctx.fillText('Fold', rx + sname * x, ry + sname * y);
@@ -114,13 +123,6 @@ export default {
                 ctx.closePath();
                 ctx.stroke();
 
-                ctx.beginPath();
-                ctx.lineWidth = 5;
-                ctx.strokeStyle = '#b92323';
-                if (turnx && turny) {
-                    ctx.ellipse(turnx, turny, sturn * sx, sturn * sy, 0, 0, Math.PI * 2);
-                }
-                ctx.stroke();
             }
         }
     }

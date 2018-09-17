@@ -5,6 +5,7 @@ from flask_socketio import SocketIO, emit, join_room,\
     leave_room, close_room
 
 from gameplay import Room, HumanPlayer, AiPlayer
+import serialization as ser
 
 app = Flask(__name__,
             static_folder='../dist/static',
@@ -27,7 +28,7 @@ def response(status, code, msg):
 
 
 def hand_finished(summary, room):
-    socketio.emit('hand finished', summary, room=room)
+    socketio.emit('hand finished', ser.serialize_summary(summary), room=room)
 
 
 def update_players(room):

@@ -2,32 +2,8 @@ import threading
 import time
 
 from pokergame import Game, player
-from deuces import Card
 
-
-def serialize_card(card):
-    suit_int = Card.get_suit_int(card)
-    rank_int = Card.get_rank_int(card)
-
-    s = Card.INT_SUIT_TO_CHAR_SUIT[suit_int]
-    r = Card.STR_RANKS[rank_int]
-
-    return s + r
-
-
-def serialize_cards(cards):
-    return list(map(serialize_card, cards))
-
-
-def serialize_players(players, active_players, player_at_action):
-    return [ {
-        'name': p.name,
-        'stack': p.stack,
-        'bet': p.bet,
-        'hand': serialize_cards(p.hand),
-        'action_required': p == player_at_action,
-        'folded': p not in active_players
-    } for p in players ]
+import serialization as ser
 
 
 class ReportingPlayer(player.PlayerBase):
@@ -39,19 +15,17 @@ class ReportingPlayer(player.PlayerBase):
         self.room = room
         self.socket = socket
 
-    def move(self, players, board, to_call, pot):
+    def move(self, players, board, to_call):
 
-        all_players = self.room.game.players
         payload = {
-            'board': serialize_cards(board),
+            'board': ser.serialize_cards(board),
             'to_call': to_call,
-            'pot': pot,
-            'players': serialize_players(all_players, players, self),
+            'players': ser.serialize_players(players, self)
         }
 
         self.socket.emit('move', payload, room=self.room.name)
 
-        return player.PlayerBase.move(self, players, board, to_call, pot)
+        return player.PlayerBase.move(self, players, board, to_call)
 
 
 class AiPlayer(ReportingPlayer):
@@ -59,8 +33,8 @@ class AiPlayer(ReportingPlayer):
     def __init__(self, name, initstack, sid, room, socket, *dummy):
         ReportingPlayer.__init__(self, name, initstack, sid, room, socket)
 
-    def move(self, players, board, to_call, pot):
-        rv = ReportingPlayer.move(self, players, board, to_call, pot)
+    def move(self, players, board, to_call):
+        rv = ReportingPlayer.move(self, players, board, to_call)
         time.sleep(1)
         return rv
 
@@ -72,13 +46,13 @@ class HumanPlayer(ReportingPlayer):
 
         self.event_storage = event_storage
 
-    def move(self, players, board, to_call, pot):
+    def move(self, players, board, to_call):
 
         event = threading.Event()
         event.data = {}
         self.event_storage[self.room.name][self.name] = event
 
-        ReportingPlayer.move(self, players, board, to_call, pot)
+        ReportingPlayer.move(self, players, board, to_call)
 
         event.wait()
         return int(event.data['betsize'])
@@ -114,7 +88,9 @@ class Room(object):
         return 'err', 404, 'The game is not running!'
 
     def serialize_players(self):
-        return serialize_players(self.game.players, self.game.players, None)
+        return ser.serialize_players(self.game.players,
+                                     self.game.players,
+                                     None)
 
     def join(self, player):
 

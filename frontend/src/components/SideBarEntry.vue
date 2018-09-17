@@ -1,26 +1,34 @@
 <template>
     <div class="entry" :class="{ visible: visible }" @mouseover="show" @mouseout="lazyHide">
         <template v-if="visible">
-            <span class="heading">{{ heading }}</span>
-            <p v-for="(p, i) in content" :key="'content-' + i">
+            <span class="heading">Hand# {{ handNum }}</span>
+            <div class="board">
+                <card v-for="(c, i) in board" :key="'boardcard-' + i" :ident="c" :size="30"/>
+            </div>
+            <p v-for="(w, i) in winners" :key="'content-' + i">
                 <span class="content">
-                    {{ p }}
+                    {{ w.name }} won {{ w.pot }} with <div class="cards"><card :ident="w.hand[0]" :size="15" /><card :ident="w.hand[1]" :size="15" /></div> ({{ w.hand_score }})
                 </span>
             </p>
-            <a href="javascript:void(0)" @click="hide">&times;</a>
         </template>
     </div>
 </template>
 
 <script>
+import Card from './Card.vue'
+
 export default {
     name: "SideBarEntry",
+    components: {
+        Card
+    },
     props: {
-        heading: String,
-        content: Array,
+        handNum: Number,
+        winners: Array,
+        board: Array,
         minTimeVisible: {
             type: Number,
-            default: 1000
+            default: 750
         }
     },
     data: function() {
@@ -58,6 +66,17 @@ export default {
 </script>
 
 <style scoped>
+
+.board {
+    display: inline-block;
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.cards {
+    display: inline
+}
 
 .entry {
     background: #b92323;

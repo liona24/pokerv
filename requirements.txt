@@ -4,7 +4,7 @@ Flask-SocketIO==3.0.1
 itsdangerous==0.24
 Jinja2==2.10
 MarkupSafe==1.0
--e git+git@github.com:liona24/pokergame.git@25791799604f0434b870a6a5ea3587e1cf1b8edc#egg=pokergame
+-e git+git@github.com:liona24/pokergame.git@1b72001ac785ffe4dd7dd9103db08d9f16018c2b#egg=pokergame
 python-engineio==2.2.0
 python-socketio==2.0.0
 six==1.11.0

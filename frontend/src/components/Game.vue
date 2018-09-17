@@ -9,7 +9,7 @@ import PlayerHud from './PlayerHud.vue'
 import PokerTable from './PokerTable.vue'
 
 import { joinRoom } from '../communication.js'
-import { flash, status } from '../EventBus.js'
+import { flash, handFinished } from '../EventBus.js'
 
 export default {
     name: 'Game',
@@ -37,7 +37,7 @@ export default {
                 name: this.user,
                 stack: 0,
                 bet: 0,
-                folded: false,
+                has_folded: false,
                 action_required: false
             });
         }
@@ -99,8 +99,7 @@ export default {
             console.log('onHandFinished');
             console.log(JSON.stringify(data));
 
-            let content = data.split('\n');
-            status(content.splice(0, 1)[0], content);
+            handFinished(data.hands_played, data.board, data.winners);
         }
     }
 }

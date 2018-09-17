@@ -2,8 +2,9 @@
     <div class="status-side-bar">
         <side-bar-entry v-for="(e, i) in entries"
             :key="'side-bar-entry-' + i"
-            :content="e.content"
-            :heading="e.heading"
+            :hand-num="e.handNum"
+            :winners="e.winners"
+            :board="e.board"
             :min-time-visible="entryMinTimeVisible"
             />
     </div>
@@ -26,7 +27,7 @@ export default {
         },
         entryMinTimeVisible: {
             type: Number,
-            default: 1000
+            default: 750
         }
     },
     data: function() {
@@ -35,7 +36,7 @@ export default {
         }
     },
     created: function() {
-        EventBus.$on('status', this.addEntry);
+        EventBus.$on('hand finished', this.addEntry);
     },
     methods: {
         addEntry: function(entry) {
