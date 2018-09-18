@@ -6,16 +6,6 @@
 
 <script>
 
-/*
-playerInfoLayout = {
-    name: String,
-    stack: Number,
-    bet: Number,
-    folded: Boolean,
-    action_required: Boolean
-}
-*/
-
 export default {
     name: 'PokerTable',
     props: {
@@ -84,11 +74,11 @@ export default {
 
                     if (player.bet) {
                         if (player.is_allin) {
-                            ctx.font = "bold 15px #b92323 'Avenir', Helvetica, Arial, sans-serif";
+                            ctx.fillStyle = "#b92323";
                         }
                         ctx.fillText(player.bet, rx + sbet * x, ry + sbet * y);
                         if (player.is_allin) {
-                            ctx.font = "bold 15px 'Avenir', Helvetica, Arial, sans-serif";
+                            ctx.fillStyle = '#002323';
                         }
                     }
                     if (!player.has_folded) {
